@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheat Day Planner - Diet Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .heading-font { font-family: 'Playfair Display', serif; }
+        .button-font { font-family: 'Poppins', sans-serif; }
+        .bg-sage { background-color: #F0F4F0; }
+        .text-forest { color: #2D5A27; }
+        .text-sage { color: #8FBC8F; }
+        .bg-forest { background-color: #2D5A27; }
+        .bg-orange { background-color: #FF6B35; }
+        .text-orange { color: #FF6B35; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(45, 90, 39, 0.15); }
+        .cheat-card { background: linear-gradient(135deg, #ffffff 0%, #fff5f5 100%); }
+        .celebration { animation: celebrate 2s ease-in-out infinite; }
+        @keyframes celebrate { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    </style>
+</head>
+<body class="bg-sage min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="heading-font text-2xl font-bold text-forest">🌱 Diet Tracker</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Dashboard</a>
+                        <a href="progress.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Progress</a>
+                        <a href="meals.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Meal Library</a>
+                        <a href="cheat-day.html" class="text-forest hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Cheat Day</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="bg-gradient-to-r from-pink-50 to-orange-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="text-6xl mb-4 celebration">🎉</div>
+            <h2 class="heading-font text-4xl font-bold text-forest mb-4">Cheat Day Planner</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                Plan your well-deserved treats strategically to stay motivated and on track
+            </p>
+            <div class="bg-white rounded-2xl shadow-lg p-6 max-w-md mx-auto">
+                <div class="text-2xl font-bold text-orange mb-2">Weekly Cheat Budget</div>
+                <div class="text-4xl font-bold text-forest mb-2">1,500</div>
+                <div class="text-sm text-gray-600">calories for treats</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cheat Day Calendar -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h3 class="heading-font text-3xl font-bold text-forest mb-4">Schedule Your Treats</h3>
+                <p class="text-gray-600 text-lg">Choose your cheat days and plan your favorite indulgences</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Calendar -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h4 class="heading-font text-2xl font-semibold text-forest mb-6">This Week</h4>
+                    <div class="space-y-4" id="cheat-calendar">
+                        <!-- Calendar will be populated by JavaScript -->
+                    </div>
+                    <div class="mt-6 text-center">
+                        <button onclick="addCheatDay()" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg button-font font-semibold transition-colors">
+                            📅 Add Cheat Day
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cheat Meal Options -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h4 class="heading-font text-2xl font-semibold text-forest mb-6">Worth-It Treats</h4>
+                    <div class="space-y-4" id="cheat-meals">
+                        <!-- Cheat meals will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planned Cheat Days -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Your Planned Treats</h3>
+                <div id="planned-cheats" class="space-y-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-4">🎯</div>
+                        <p>Plan your cheat days to stay motivated and in control!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cheat Day Tips -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl shadow-lg p-8">
+                <h3 class="heading-font text-2xl font-semibold text-forest mb-6 text-center">Smart Cheat Day Strategies</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🕐</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Time It Right</h4>
+                        <p class="text-gray-600 text-sm">Plan cheat days on special occasions or when you'll enjoy them most</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🍽️</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Portion Control</h4>
+                        <p class="text-gray-600 text-sm">Enjoy your favorites in reasonable portions without overdoing it</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">💧</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Stay Hydrated</h4>
+                        <p class="text-gray-600 text-sm">Drink plenty of water before and after your treat meals</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🏃</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Move More</h4>
+                        <p class="text-gray-600 text-sm">Add extra activity on cheat day to help balance the calories</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🥗</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Balance It Out</h4>
+                        <p class="text-gray-600 text-sm">Eat lighter, nutritious meals before and after your treat</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🎯</div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Get Back on Track</h4>
+                        <p class="text-gray-600 text-sm">Return to your regular eating plan the next day without guilt</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600 button-font">© 2025 Vikas & Supriya's Diet Tracker - Your Health Journey Companion</p>
+        </div>
+    </footer>
+
+    <script>
+        // Cheat meal database
+        const cheatMeals = [
+            {
+                id: 1,
+                name: "Pizza Night",
+                calories: 800,
+                description: "2 slices of your favorite pizza",
+                emoji: "🍕",
+                category: "dinner"
+            },
+            {
+                id: 2,
+                name: "Ice Cream Treat",
+                calories: 400,
+                description: "1 cup premium ice cream",
+                emoji: "🍦",
+                category: "dessert"
+            },
+            {
+                id: 3,
+                name: "Burger & Fries",
+                calories: 900,
+                description: "Classic burger with small fries",
+                emoji: "🍔",
+                category: "lunch"
+            },
+            {
+                id: 4,
+                name: "Chocolate Indulgence",
+                calories: 300,
+                description: "High-quality dark chocolate",
+                emoji: "🍫",
+                category: "snack"
+            },
+            {
+                id: 5,
+                name: "Pasta Feast",
+                calories: 700,
+                description: "Creamy pasta with your favorite sauce",
+                emoji: "🍝",
+                category: "dinner"
+            },
+            {
+                id: 6,
+                name: "Pastry Delight",
+                calories: 450,
+                description: "Fresh pastry or croissant",
+                emoji: "🥐",
+                category: "breakfast"
+            },
+            {
+                id: 7,
+                name: "Movie Night Snacks",
+                calories: 500,
+                description: "Popcorn, candy, and soda combo",
+                emoji: "🍿",
+                category: "snack"
+            },
+            {
+                id: 8,
+                name: "Indian Sweets",
+                calories: 350,
+                description: "2 pieces of traditional mithai",
+                emoji: "🍯",
+                category: "dessert"
+            }
+        ];
+
+        let plannedCheats = [];
+        let cheatBudget = 1500;
+        let usedBudget = 0;
+
+        function generateWeeklyCalendar() {
+            const calendar = document.getElementById('cheat-calendar');
+            const today = new Date();
+            const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() + i);
+                const dayName = weekDays[date.getDay()];
+                const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                const plannedCheat = plannedCheats.find(cheat => cheat.date === date.toISOString().split('T')[0]);
+                
+                html += `
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg ${plannedCheat ? 'bg-pink-50 border-pink-200' : ''}">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-center">
+                                <div class="font-semibold text-gray-800">${dayName}</div>
+                                <div class="text-sm text-gray-600">${dateStr}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            ${plannedCheat ? `
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-2xl">${plannedCheat.emoji}</span>
+                                    <div>
+                                        <div class="font-medium text-gray-800 text-sm">${plannedCheat.name}</div>
+                                        <div class="text-xs text-gray-600">${plannedCheat.calories} cal</div>
+                                    </div>
+                                    <button onclick="removeCheatDay('${plannedCheat.id}')" class="text-red-500 hover:text-red-700 text-sm">×</button>
+                                </div>
+                            ` : `
+                                <button onclick="selectCheatDate('${date.toISOString().split('T')[0]}')" class="text-orange-500 hover:text-orange-700 text-sm font-medium">
+                                    + Add Treat
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            calendar.innerHTML = html;
+        }
+
+        function renderCheatMeals() {
+            const container = document.getElementById('cheat-meals');
+            
+            container.innerHTML = cheatMeals.map(meal => `
+                <div class="cheat-card border border-pink-200 rounded-lg p-4 card-hover cursor-pointer" onclick="selectCheatMeal(${meal.id})">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-3xl">${meal.emoji}</span>
+                            <div>
+                                <div class="font-semibold text-gray-800">${meal.name}</div>
+                                <div class="text-sm text-gray-600">${meal.description}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-orange-600">${meal.calories}</div>
+                            <div class="text-xs text-gray-500">calories</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectCheatDate(date) {
+            const selectedDate = prompt(`Add treat for ${new Date(date).toLocaleDateString()}?\n\nEnter the cheat meal ID (1-8):`);
+            if (selectedDate && selectedDate >= 1 && selectedDate <= 8) {
+                const meal = cheatMeals.find(m => m.id === parseInt(selectedDate));
+                if (meal) {
+                    addCheatDay(date, meal);
+                }
+            }
+        }
+
+        function selectCheatMeal(mealId) {
+            const meal = cheatMeals.find(m => m.id === mealId);
+            if (meal) {
+                const date = prompt(`When would you like to enjoy ${meal.name}?\n\nEnter date (YYYY-MM-DD):`);
+                if (date) {
+                    addCheatDay(date, meal);
+                }
+            }
+        }
+
+        function addCheatDay(date, meal) {
+            const cheatId = date + '_' + meal.id;
+            
+            // Check if already planned
+            if (plannedCheats.find(cheat => cheat.id === cheatId)) {
+                alert('This treat is already planned for this date!');
+                return;
+            }
+            
+            // Check budget
+            if (usedBudget + meal.calories > cheatBudget) {
+                alert(`This would exceed your weekly cheat budget!\nRemaining budget: ${cheatBudget - usedBudget} calories`);
+                return;
+            }
+            
+            plannedCheats.push({
+                id: cheatId,
+                date: date,
+                mealId: meal.id,
+                name: meal.name,
+                calories: meal.calories,
+                emoji: meal.emoji
+            });
+            
+            usedBudget += meal.calories;
+            
+            updatePlannedCheats();
+            generateWeeklyCalendar();
+            updateBudgetDisplay();
+            
+            // Show success message
+            showSuccessMessage(`${meal.name} scheduled for ${new Date(date).toLocaleDateString()}!`);
+        }
+
+        function removeCheatDay(cheatId) {
+            const cheat = plannedCheats.find(c => c.id === cheatId);
+            if (cheat) {
+                plannedCheats = plannedCheats.filter(c => c.id !== cheatId);
+                usedBudget -= cheat.calories;
+                
+                updatePlannedCheats();
+                generateWeeklyCalendar();
+                updateBudgetDisplay();
+            }
+        }
+
+        function updatePlannedCheats() {
+            const container = document.getElementById('planned-cheats');
+            
+            if (plannedCheats.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-4">🎯</div>
+                        <p>Plan your cheat days to stay motivated and in control!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date
+            plannedCheats.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            container.innerHTML = plannedCheats.map(cheat => `
+                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 to-orange-50 rounded-lg border border-pink-200">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-3xl">${cheat.emoji}</span>
+                        <div>
+                            <div class="font-semibold text-gray-800">${cheat.name}</div>
+                            <div class="text-sm text-gray-600">${new Date(cheat.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-orange-600">${cheat.calories} cal</div>
+                        <button onclick="removeCheatDay('${cheat.id}')" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateBudgetDisplay() {
+            const remaining = cheatBudget - usedBudget;
+            const usedPercent = (usedBudget / cheatBudget) * 100;
+            
+            // Update the header display
+            const budgetDisplay = document.querySelector('.bg-white.rounded-2xl.shadow-lg.p-6');
+            if (budgetDisplay) {
+                budgetDisplay.innerHTML = `
+                    <div class="text-2xl font-bold text-orange mb-2">Weekly Cheat Budget</div>
+                    <div class="text-4xl font-bold text-forest mb-2">${remaining}</div>
+                    <div class="text-sm text-gray-600 mb-4">calories remaining</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-orange-500 h-2 rounded-full transition-all duration-500" style="width: ${usedPercent}%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">${usedBudget} of ${cheatBudget} calories used</div>
+                `;
+            }
+        }
+
+        function showSuccessMessage(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            generateWeeklyCalendar();
+            renderCheatMeals();
+            updatePlannedCheats();
+            
+            // Animate elements
+            const cards = document.querySelectorAll('.card-hover');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            translateY: [50, 0],
+                            opacity: [0, 1],
+                            duration: 800,
+                            easing: 'easeOutQuart',
+                            delay: Math.random() * 200
+                        });
+                    }
+                });
+            });
+
+            cards.forEach(card => observer.observe(card));
+        });
+    </script>
+</body>
+</html>

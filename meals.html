@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Library - Diet Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .heading-font { font-family: 'Playfair Display', serif; }
+        .button-font { font-family: 'Poppins', sans-serif; }
+        .bg-sage { background-color: #F0F4F0; }
+        .text-forest { color: #2D5A27; }
+        .text-sage { color: #8FBC8F; }
+        .bg-forest { background-color: #2D5A27; }
+        .bg-orange { background-color: #FF6B35; }
+        .text-orange { color: #FF6B35; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(45, 90, 39, 0.15); }
+        .meal-card { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); }
+        .filter-active { background-color: #2D5A27; color: white; }
+        .filter-inactive { background-color: #f3f4f6; color: #374151; }
+    </style>
+</head>
+<body class="bg-sage min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="heading-font text-2xl font-bold text-forest">🌱 Diet Tracker</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Dashboard</a>
+                        <a href="progress.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Progress</a>
+                        <a href="meals.html" class="text-forest hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Meal Library</a>
+                        <a href="cheat-day.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Cheat Day</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="bg-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="heading-font text-4xl font-bold text-forest mb-4">Meal Library</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                Discover delicious, healthy meal options with detailed nutritional information
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="max-w-md mx-auto">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Search meals..." 
+                           class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-400">🔍</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="py-8 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button onclick="filterMeals('all')" class="filter-btn filter-active px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="all">
+                    All Meals
+                </button>
+                <button onclick="filterMeals('breakfast')" class="filter-btn filter-inactive px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="breakfast">
+                    🌅 Breakfast
+                </button>
+                <button onclick="filterMeals('lunch')" class="filter-btn filter-inactive px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="lunch">
+                    🌞 Lunch
+                </button>
+                <button onclick="filterMeals('dinner')" class="filter-btn filter-inactive px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="dinner">
+                    🌙 Dinner
+                </button>
+                <button onclick="filterMeals('snack')" class="filter-btn filter-inactive px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="snack">
+                    🍎 Snacks
+                </button>
+                <button onclick="filterMeals('vegetarian')" class="filter-btn filter-inactive px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="vegetarian">
+                    🥬 Vegetarian
+                </button>
+                <button onclick="filterMeals('high-protein')" class="filter-btn filter-inactive px-6 py-2 rounded-full button-font font-medium transition-colors" data-filter="high-protein">
+                    💪 High Protein
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meal Cards Grid -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="meals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Meal cards will be populated by JavaScript -->
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="no-results" class="hidden text-center py-12">
+                <div class="text-6xl mb-4">🔍</div>
+                <h3 class="heading-font text-2xl font-semibold text-gray-600 mb-2">No meals found</h3>
+                <p class="text-gray-500">Try adjusting your search or filters</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meal Detail Modal -->
+    <div id="meal-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <h3 id="modal-title" class="heading-font text-3xl font-bold text-forest"></h3>
+                <button onclick="closeMealModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+            
+            <div id="modal-content">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            
+            <div class="flex space-x-4 mt-8">
+                <button onclick="addToMealPlan()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg button-font font-semibold transition-colors">
+                    Add to Meal Plan
+                </button>
+                <button onclick="closeMealModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg button-font font-semibold transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600 button-font">© 2025 Vikas & Supriya's Diet Tracker - Your Health Journey Companion</p>
+        </div>
+    </footer>
+
+    <script>
+        // Comprehensive meal database with your specific diet plan integrated
+        const mealDatabase = [
+            // Breakfast Options (including your diet plan)
+            {
+                id: 1,
+                name: "Scrambled Eggs with Spinach & Tomatoes",
+                category: "breakfast",
+                calories: 320,
+                protein: 24,
+                carbs: 8,
+                fat: 22,
+                fiber: 3,
+                tags: ["high-protein", "vegetarian"],
+                ingredients: ["3 eggs", "1 cup spinach", "1 tomato", "1 tsp olive oil", "salt", "pepper"],
+                instructions: "Heat oil in pan, sauté spinach until wilted. Add beaten eggs and diced tomatoes. Cook until fluffy.",
+                prepTime: "10 minutes",
+                description: "Protein-rich breakfast with fresh vegetables and healthy fats"
+            },
+            {
+                id: 2,
+                name: "Overnight Oats with Almond Milk & Chia Seeds",
+                category: "breakfast",
+                calories: 380,
+                protein: 12,
+                carbs: 58,
+                fat: 14,
+                fiber: 11,
+                tags: ["vegetarian"],
+                ingredients: ["1/2 cup oats", "1/2 cup almond milk", "1 tbsp chia seeds", "1/2 banana", "berries", "honey"],
+                instructions: "Mix all ingredients in jar. Refrigerate overnight. Top with berries in morning.",
+                prepTime: "5 minutes + overnight",
+                description: "Fiber-rich, make-ahead breakfast that keeps you full until lunch"
+            },
+            {
+                id: 3,
+                name: "Vegetable Omelette (2 Eggs)",
+                category: "breakfast",
+                calories: 280,
+                protein: 18,
+                carbs: 12,
+                fat: 18,
+                fiber: 3,
+                tags: ["high-protein", "vegetarian"],
+                ingredients: ["2 eggs", "1/4 cup bell peppers", "1/4 cup onions", "1/4 cup tomatoes", "1 tsp oil"],
+                instructions: "Beat eggs, pour into heated pan. Add vegetables, fold omelette in half when set.",
+                prepTime: "8 minutes",
+                description: "Quick and nutritious breakfast packed with vegetables"
+            },
+            {
+                id: 4,
+                name: "Greek Yogurt Parfait",
+                category: "breakfast",
+                calories: 250,
+                protein: 20,
+                carbs: 25,
+                fat: 8,
+                fiber: 4,
+                tags: ["high-protein", "vegetarian"],
+                ingredients: ["1 cup Greek yogurt", "1/4 cup granola", "1/2 cup berries", "1 tbsp honey"],
+                instructions: "Layer yogurt, berries, and granola. Drizzle with honey.",
+                prepTime: "3 minutes",
+                description: "High-protein breakfast with probiotics and antioxidants"
+            },
+            {
+                id: 5,
+                name: "Vegetable Poha",
+                category: "breakfast",
+                calories: 300,
+                protein: 8,
+                carbs: 55,
+                fat: 8,
+                fiber: 5,
+                tags: ["vegetarian"],
+                ingredients: ["1 cup poha", "1/2 cup mixed vegetables", "1 tsp mustard seeds", "curry leaves", "turmeric"],
+                instructions: "Rinse poha, drain. Heat oil, add mustard seeds, vegetables. Mix with poha and spices.",
+                prepTime: "15 minutes",
+                description: "Light and healthy Indian breakfast with flattened rice"
+            },
+            {
+                id: 6,
+                name: "Protein Smoothie Bowl",
+                category: "breakfast",
+                calories: 420,
+                protein: 25,
+                carbs: 45,
+                fat: 18,
+                fiber: 8,
+                tags: ["high-protein"],
+                ingredients: ["1 scoop protein powder", "1 banana", "1/2 cup berries", "1 tbsp almond butter", "granola"],
+                instructions: "Blend protein powder with banana and berries. Pour into bowl, top with granola.",
+                prepTime: "5 minutes",
+                description: "Post-workout breakfast with complete proteins and healthy carbs"
+            },
+
+            // Lunch Options (including your diet plan)
+            {
+                id: 7,
+                name: "Grilled Chicken with Quinoa & Vegetables",
+                category: "lunch",
+                calories: 480,
+                protein: 42,
+                carbs: 35,
+                fat: 18,
+                fiber: 8,
+                tags: ["high-protein"],
+                ingredients: ["150g chicken breast", "1/2 cup quinoa", "1 cup mixed vegetables", "1 tsp olive oil", "herbs"],
+                instructions: "Season and grill chicken. Cook quinoa. Steam or roast vegetables. Serve together.",
+                prepTime: "25 minutes",
+                description: "Balanced meal with lean protein, complex carbs, and fiber-rich vegetables"
+            },
+            {
+                id: 8,
+                name: "Dal with Chapati & Sabji",
+                category: "lunch",
+                calories: 450,
+                protein: 16,
+                carbs: 68,
+                fat: 12,
+                fiber: 12,
+                tags: ["vegetarian"],
+                ingredients: ["1 cup dal", "2 chapatis", "mixed vegetable sabji", "1 tsp ghee"],
+                instructions: "Pressure cook dal with spices. Prepare sabji. Serve with warm chapatis.",
+                prepTime: "30 minutes",
+                description: "Traditional Indian meal with complete proteins and complex carbohydrates"
+            },
+            {
+                id: 9,
+                name: "Chickpea Salad Bowl",
+                category: "lunch",
+                calories: 380,
+                protein: 16,
+                carbs: 52,
+                fat: 12,
+                fiber: 14,
+                tags: ["vegetarian", "high-protein"],
+                ingredients: ["1 cup chickpeas", "mixed vegetables", "lemon dressing", "herbs", "cucumber", "tomatoes"],
+                instructions: "Mix boiled chickpeas with chopped vegetables. Add lemon dressing and herbs.",
+                prepTime: "15 minutes",
+                description: "Protein-rich salad with fresh vegetables and tangy dressing"
+            },
+            {
+                id: 10,
+                name: "Chicken Salad Sandwich",
+                category: "lunch",
+                calories: 420,
+                protein: 28,
+                carbs: 35,
+                fat: 20,
+                fiber: 6,
+                tags: ["high-protein"],
+                ingredients: ["100g cooked chicken", "whole wheat bread", "lettuce", "tomato", "light mayo"],
+                instructions: "Mix chicken with mayo. Toast bread. Assemble sandwich with lettuce and tomato.",
+                prepTime: "10 minutes",
+                description: "Satisfying sandwich with lean protein and fresh vegetables"
+            },
+            {
+                id: 11,
+                name: "Quinoa Buddha Bowl",
+                category: "lunch",
+                calories: 440,
+                protein: 18,
+                carbs: 58,
+                fat: 16,
+                fiber: 12,
+                tags: ["vegetarian", "high-protein"],
+                ingredients: ["1/2 cup quinoa", "roasted vegetables", "chickpeas", "tahini dressing", "avocado"],
+                instructions: "Cook quinoa, roast vegetables. Arrange in bowl with chickpeas and avocado.",
+                prepTime: "35 minutes",
+                description: "Nutrient-dense bowl with complete proteins and healthy fats"
+            },
+            {
+                id: 12,
+                name: "Kidney Bean Salad",
+                category: "lunch",
+                calories: 360,
+                protein: 18,
+                carbs: 48,
+                fat: 10,
+                fiber: 16,
+                tags: ["vegetarian", "high-protein"],
+                ingredients: ["1 cup kidney beans", "onion", "bell peppers", "coriander", "lemon juice"],
+                instructions: "Mix boiled beans with chopped vegetables. Season with lemon and herbs.",
+                prepTime: "12 minutes",
+                description: "High-fiber, protein-rich salad with colorful vegetables"
+            },
+
+            // Dinner Options (including your diet plan)
+            {
+                id: 13,
+                name: "Grilled Fish with Sweet Potato",
+                category: "dinner",
+                calories: 420,
+                protein: 35,
+                carbs: 32,
+                fat: 18,
+                fiber: 6,
+                tags: ["high-protein"],
+                ingredients: ["150g fish fillet", "1 medium sweet potato", "mixed green salad", "1 tsp olive oil"],
+                instructions: "Season and grill fish. Bake sweet potato. Serve with fresh salad.",
+                prepTime: "30 minutes",
+                description: "Light dinner with omega-3 fatty acids and complex carbohydrates"
+            },
+            {
+                id: 14,
+                name: "Stir-fried Shrimp with Vegetables",
+                category: "dinner",
+                calories: 450,
+                protein: 32,
+                carbs: 38,
+                fat: 20,
+                fiber: 8,
+                tags: ["high-protein"],
+                ingredients: ["150g shrimp", "mixed vegetables", "1/2 cup rice", "soy sauce", "ginger", "garlic"],
+                instructions: "Stir-fry shrimp and vegetables. Season with soy sauce. Serve over rice.",
+                prepTime: "20 minutes",
+                description: "Quick and flavorful dinner with lean protein and fresh vegetables"
+            },
+            {
+                id: 15,
+                name: "Dal with Chapati & Sabji",
+                category: "dinner",
+                calories: 400,
+                protein: 15,
+                carbs: 62,
+                fat: 10,
+                fiber: 11,
+                tags: ["vegetarian"],
+                ingredients: ["1 cup dal", "2 chapatis", "seasonal sabji", "1 tsp oil"],
+                instructions: "Cook dal, prepare sabji. Serve with chapatis for a complete meal.",
+                prepTime: "25 minutes",
+                description: "Comforting and nutritious dinner with plant-based proteins"
+            },
+            {
+                id: 16,
+                name: "Chicken Curry with Roti",
+                category: "dinner",
+                calories: 460,
+                protein: 32,
+                carbs: 35,
+                fat: 22,
+                fiber: 5,
+                tags: ["high-protein"],
+                ingredients: ["150g chicken", "curry spices", "1 roti", "onions", "tomatoes"],
+                instructions: "Prepare chicken curry with spices. Serve with whole wheat roti.",
+                prepTime: "40 minutes",
+                description: "Traditional Indian curry with lean protein and aromatic spices"
+            },
+            {
+                id: 17,
+                name: "Vegetable Pasta",
+                category: "dinner",
+                calories: 380,
+                protein: 14,
+                carbs: 62,
+                fat: 10,
+                fiber: 8,
+                tags: ["vegetarian"],
+                ingredients: ["1 cup pasta", "mixed vegetables", "tomato sauce", "herbs", "parmesan"],
+                instructions: "Cook pasta, sauté vegetables. Mix with sauce and serve with cheese.",
+                prepTime: "25 minutes",
+                description: "Satisfying pasta dinner loaded with colorful vegetables"
+            },
+            {
+                id: 18,
+                name: "Egg Noodles",
+                category: "dinner",
+                calories: 420,
+                protein: 20,
+                carbs: 48,
+                fat: 16,
+                fiber: 4,
+                tags: ["vegetarian"],
+                ingredients: ["1 cup noodles", "2 eggs", "vegetables", "soy sauce", "sesame oil"],
+                instructions: "Cook noodles, scramble eggs. Stir-fry everything together.",
+                prepTime: "15 minutes",
+                description: "Quick and easy dinner with eggs and vegetables"
+            },
+
+            // Snack Options (including your diet plan)
+            {
+                id: 19,
+                name: "Greek Yogurt with Almonds",
+                category: "snack",
+                calories: 180,
+                protein: 12,
+                carbs: 10,
+                fat: 12,
+                fiber: 3,
+                tags: ["high-protein", "vegetarian"],
+                ingredients: ["1/2 cup Greek yogurt", "8-10 almonds", "honey (optional)"],
+                instructions: "Top yogurt with almonds and a drizzle of honey if desired.",
+                prepTime: "2 minutes",
+                description: "High-protein snack with healthy fats and probiotics"
+            },
+            {
+                id: 20,
+                name: "Apple with Almond Butter",
+                category: "snack",
+                calories: 150,
+                protein: 4,
+                carbs: 20,
+                fat: 8,
+                fiber: 5,
+                tags: ["vegetarian"],
+                ingredients: ["1 medium apple", "1 tbsp almond butter"],
+                instructions: "Slice apple and serve with almond butter for dipping.",
+                prepTime: "2 minutes",
+                description: "Perfect balance of natural sugars, fiber, and healthy fats"
+            },
+            {
+                id: 21,
+                name: "Mixed Fruit Bowl",
+                category: "snack",
+                calories: 120,
+                protein: 2,
+                carbs: 30,
+                fat: 0,
+                fiber: 6,
+                tags: ["vegetarian"],
+                ingredients: ["seasonal fruits", "lime juice", "mint leaves"],
+                instructions: "Cut fruits into pieces, mix with lime juice and mint.",
+                prepTime: "5 minutes",
+                description: "Refreshing snack with vitamins, minerals, and natural antioxidants"
+            },
+            {
+                id: 22,
+                name: "Roasted Chickpeas",
+                category: "snack",
+                calories: 140,
+                protein: 6,
+                carbs: 20,
+                fat: 4,
+                fiber: 6,
+                tags: ["vegetarian", "high-protein"],
+                ingredients: ["1/2 cup chickpeas", "spices", "1 tsp oil"],
+                instructions: "Toss chickpeas with oil and spices. Roast at 400°F for 20 minutes.",
+                prepTime: "25 minutes",
+                description: "Crunchy, satisfying snack high in protein and fiber"
+            },
+            {
+                id: 23,
+                name: "Paneer Cubes",
+                category: "snack",
+                calories: 160,
+                protein: 14,
+                carbs: 4,
+                fat: 10,
+                fiber: 0,
+                tags: ["vegetarian", "high-protein"],
+                ingredients: ["50g paneer", "spices", "lemon juice"],
+                instructions: "Cut paneer into cubes, season with spices and lemon juice.",
+                prepTime: "2 minutes",
+                description: "Quick protein-rich snack with calcium and healthy fats"
+            },
+            {
+                id: 24,
+                name: "Baby Carrots & Cucumbers",
+                category: "snack",
+                calories: 50,
+                protein: 2,
+                carbs: 12,
+                fat: 0,
+                fiber: 4,
+                tags: ["vegetarian"],
+                ingredients: ["baby carrots", "cucumber", "hummus (optional)"],
+                instructions: "Wash and cut vegetables. Serve with hummus if desired.",
+                prepTime: "3 minutes",
+                description: "Low-calorie, crunchy snack with vitamins and hydration"
+            }
+        ];
+
+        let filteredMeals = [...mealDatabase];
+        let selectedMeal = null;
+
+        function renderMeals(meals) {
+            const grid = document.getElementById('meals-grid');
+            const noResults = document.getElementById('no-results');
+            
+            if (meals.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            noResults.classList.add('hidden');
+            
+            grid.innerHTML = meals.map(meal => `
+                <div class="meal-card rounded-2xl shadow-lg overflow-hidden card-hover cursor-pointer" onclick="showMealDetail(${meal.id})">
+                    <div class="h-48 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                        <span class="text-6xl">${getMealEmoji(meal.category)}</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-semibold text-gray-800 text-lg leading-tight">${meal.name}</h3>
+                            <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
+                                ${meal.calories} cal
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${meal.description}</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+                            <span>⏱️ ${meal.prepTime}</span>
+                            <span>🥄 ${meal.ingredients.length} ingredients</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 text-xs">
+                            <div class="text-center p-2 bg-blue-50 rounded">
+                                <div class="font-semibold text-blue-600">${meal.protein}g</div>
+                                <div class="text-gray-500">Protein</div>
+                            </div>
+                            <div class="text-center p-2 bg-yellow-50 rounded">
+                                <div class="font-semibold text-yellow-600">${meal.carbs}g</div>
+                                <div class="text-gray-500">Carbs</div>
+                            </div>
+                            <div class="text-center p-2 bg-green-50 rounded">
+                                <div class="font-semibold text-green-600">${meal.fat}g</div>
+                                <div class="text-gray-500">Fat</div>
+                            </div>
+                            <div class="text-center p-2 bg-purple-50 rounded">
+                                <div class="font-semibold text-purple-600">${meal.fiber}g</div>
+                                <div class="text-gray-500">Fiber</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            ${meal.tags.map(tag => `
+                                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                                    ${getTagEmoji(tag)} ${tag.replace('-', ' ')}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getMealEmoji(category) {
+            const emojis = {
+                breakfast: '🌅',
+                lunch: '🌞',
+                dinner: '🌙',
+                snack: '🍎'
+            };
+            return emojis[category] || '🍽️';
+        }
+
+        function getTagEmoji(tag) {
+            const emojis = {
+                vegetarian: '🥬',
+                'high-protein': '💪'
+            };
+            return emojis[tag] || '🏷️';
+        }
+
+        function filterMeals(filter) {
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('filter-active');
+                btn.classList.add('filter-inactive');
+            });
+            
+            event.target.classList.remove('filter-inactive');
+            event.target.classList.add('filter-active');
+            
+            // Filter meals
+            if (filter === 'all') {
+                filteredMeals = [...mealDatabase];
+            } else {
+                filteredMeals = mealDatabase.filter(meal => 
+                    meal.category === filter || meal.tags.includes(filter)
+                );
+            }
+            
+            renderMeals(filteredMeals);
+        }
+
+        function searchMeals(query) {
+            const searchTerm = query.toLowerCase();
+            const searchedMeals = filteredMeals.filter(meal =>
+                meal.name.toLowerCase().includes(searchTerm) ||
+                meal.description.toLowerCase().includes(searchTerm) ||
+                meal.ingredients.some(ingredient => ingredient.toLowerCase().includes(searchTerm))
+            );
+            
+            renderMeals(searchedMeals);
+        }
+
+        function showMealDetail(mealId) {
+            const meal = mealDatabase.find(m => m.id === mealId);
+            if (!meal) return;
+            
+            selectedMeal = meal;
+            
+            document.getElementById('modal-title').textContent = meal.name;
+            document.getElementById('modal-content').innerHTML = `
+                <div class="mb-6">
+                    <div class="h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-4xl">${getMealEmoji(meal.category)}</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">${meal.description}</p>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="font-semibold text-gray-800 mb-2">Nutrition Facts</div>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Calories</span>
+                                    <span class="font-medium">${meal.calories}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Protein</span>
+                                    <span class="font-medium">${meal.protein}g</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Carbs</span>
+                                    <span class="font-medium">${meal.carbs}g</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Fat</span>
+                                    <span class="font-medium">${meal.fat}g</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Fiber</span>
+                                    <span class="font-medium">${meal.fiber}g</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="font-semibold text-gray-800 mb-2">Recipe Info</div>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Prep Time</span>
+                                    <span class="font-medium">${meal.prepTime}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Category</span>
+                                    <span class="font-medium capitalize">${meal.category}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Ingredients</span>
+                                    <span class="font-medium">${meal.ingredients.length}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-800 mb-3">Ingredients</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        ${meal.ingredients.map(ingredient => `
+                            <div class="flex items-center space-x-2">
+                                <span class="text-green-500">✓</span>
+                                <span class="text-gray-600">${ingredient}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="font-semibold text-gray-800 mb-3">Instructions</h4>
+                    <p class="text-gray-600">${meal.instructions}</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    ${meal.tags.map(tag => `
+                        <span class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">
+                            ${getTagEmoji(tag)} ${tag.replace('-', ' ')}
+                        </span>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('meal-modal').classList.remove('hidden');
+        }
+
+        function closeMealModal() {
+            document.getElementById('meal-modal').classList.add('hidden');
+            selectedMeal = null;
+        }
+
+        function addToMealPlan() {
+            if (selectedMeal) {
+                // Here you would typically add the meal to the user's meal plan
+                // For now, we'll show a success message
+                alert(`${selectedMeal.name} added to your meal plan!`);
+                closeMealModal();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMeals(mealDatabase);
+            
+            // Add search functionality
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', (e) => {
+                searchMeals(e.target.value);
+            });
+            
+            // Animate cards on load
+            const cards = document.querySelectorAll('.card-hover');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            translateY: [50, 0],
+                            opacity: [0, 1],
+                            duration: 800,
+                            easing: 'easeOutQuart',
+                            delay: Math.random() * 200
+                        });
+                    }
+                });
+            });
+
+            cards.forEach(card => observer.observe(card));
+        });
+
+        // Handle escape key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMealModal();
+            }
+        });
+    </script>
+</body>
+</html>

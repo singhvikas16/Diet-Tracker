@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vikas & Supriya's Diet Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .heading-font { font-family: 'Playfair Display', serif; }
+        .button-font { font-family: 'Poppins', sans-serif; }
+        .bg-sage { background-color: #F0F4F0; }
+        .text-forest { color: #2D5A27; }
+        .text-sage { color: #8FBC8F; }
+        .bg-forest { background-color: #2D5A27; }
+        .bg-orange { background-color: #FF6B35; }
+        .text-orange { color: #FF6B35; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(45, 90, 39, 0.15); }
+        .progress-ring { transition: stroke-dasharray 0.5s ease-in-out; }
+        .meal-card { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); }
+        .hero-bg { background: linear-gradient(135deg, #2D5A27 0%, #8FBC8F 100%); }
+        .floating { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(45, 90, 39, 0.3); } 50% { box-shadow: 0 0 30px rgba(45, 90, 39, 0.5); } }
+    </style>
+</head>
+<body class="bg-sage min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="heading-font text-2xl font-bold text-forest">🌱 Diet Tracker</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="text-forest hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Dashboard</a>
+                        <a href="progress.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Progress</a>
+                        <a href="meals.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Meal Library</a>
+                        <a href="cheat-day.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Cheat Day</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="heading-font text-4xl md:text-6xl font-bold text-white mb-4">
+                    <span id="typed-text"></span>
+                </h2>
+                <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                    Your personalized journey from 93kg to 80kg with delicious, healthy meals and smart tracking
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="scrollToSection('meal-planner')" class="bg-orange hover:bg-orange/90 text-white px-8 py-3 rounded-full button-font font-semibold text-lg transition-all duration-300 pulse-glow">
+                        Start Planning Today
+                    </button>
+                    <button onclick="logWeight()" class="bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-full button-font font-semibold text-lg transition-all duration-300 border border-white/30">
+                        Log Weight
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="py-8 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl card-hover">
+                    <div class="text-3xl font-bold text-forest mb-2" id="current-weight">93.0</div>
+                    <div class="text-sm text-gray-600 button-font">Current Weight (kg)</div>
+                </div>
+                <div class="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl card-hover">
+                    <div class="text-3xl font-bold text-orange mb-2" id="target-weight">80.0</div>
+                    <div class="text-sm text-gray-600 button-font">Target Weight (kg)</div>
+                </div>
+                <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl card-hover">
+                    <div class="text-3xl font-bold text-blue-600 mb-2" id="weight-lost">0.0</div>
+                    <div class="text-sm text-gray-600 button-font">Weight Lost (kg)</div>
+                </div>
+                <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl card-hover">
+                    <div class="text-3xl font-bold text-purple-600 mb-2" id="streak-days">1</div>
+                    <div class="text-sm text-gray-600 button-font">Day Streak</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Today's Meal Planner -->
+    <section id="meal-planner" class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h3 class="heading-font text-3xl font-bold text-forest mb-4">Today's Meal Plan</h3>
+                <p class="text-gray-600 text-lg">Choose from your personalized diet plan or swap with alternatives</p>
+            </div>
+
+            <!-- Daily Calorie Progress -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="heading-font text-2xl font-semibold text-forest">Daily Calorie Target</h4>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-orange" id="calories-consumed">0</div>
+                        <div class="text-sm text-gray-600">/ 1800 calories</div>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+                    <div class="bg-gradient-to-r from-green-400 to-green-600 h-4 rounded-full transition-all duration-500" id="calorie-progress" style="width: 0%"></div>
+                </div>
+                <div class="text-sm text-gray-600 text-center" id="calorie-status">Start logging your meals to track calories!</div>
+            </div>
+
+            <!-- Meal Sections -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Breakfast -->
+                <div class="meal-card rounded-2xl shadow-lg p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="heading-font text-xl font-semibold text-forest">🌅 Breakfast</h4>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full button-font">7:30-8:30 AM</span>
+                    </div>
+                    <div class="space-y-3" id="breakfast-options">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Scrambled eggs with spinach & tomatoes</div>
+                                <div class="text-sm text-gray-600">+ Whole-grain toast + Protein shake</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">420 cal</div>
+                                <button onclick="selectMeal('breakfast', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Overnight oats with almond milk</div>
+                                <div class="text-sm text-gray-600">+ Chia seeds + Sliced fruits</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">380 cal</div>
+                                <button onclick="selectMeal('breakfast', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Vegetable omelette (2 eggs)</div>
+                                <div class="text-sm text-gray-600">+ Bell peppers + Tomatoes + Onions</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">320 cal</div>
+                                <button onclick="selectMeal('breakfast', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lunch -->
+                <div class="meal-card rounded-2xl shadow-lg p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="heading-font text-xl font-semibold text-forest">🌞 Lunch</h4>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full button-font">12:30 PM</span>
+                    </div>
+                    <div class="space-y-3" id="lunch-options">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Grilled Chicken</div>
+                                <div class="text-sm text-gray-600">+ Quinoa/Brown Rice + Steamed Vegetables</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">480 cal</div>
+                                <button onclick="selectMeal('lunch', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Dal (1 Bowl)</div>
+                                <div class="text-sm text-gray-600">+ 2 Chapati + 1 Sabji + Salad</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">450 cal</div>
+                                <button onclick="selectMeal('lunch', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Chickpea Salad</div>
+                                <div class="text-sm text-gray-600">+ Kala Chana + Kidney Beans</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">380 cal</div>
+                                <button onclick="selectMeal('lunch', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Snacks -->
+                <div class="meal-card rounded-2xl shadow-lg p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="heading-font text-xl font-semibold text-forest">🍎 Snacks</h4>
+                        <span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full button-font">11:00 AM & 4:00 PM</span>
+                    </div>
+                    <div class="space-y-3" id="snack-options">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Greek Yogurt</div>
+                                <div class="text-sm text-gray-600">+ 8-10 Almonds</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">180 cal</div>
+                                <button onclick="selectMeal('snack', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Apple Slices</div>
+                                <div class="text-sm text-gray-600">+ 1 tbsp Almond Butter</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">150 cal</div>
+                                <button onclick="selectMeal('snack', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Mixed Fruit Bowl</div>
+                                <div class="text-sm text-gray-600">+ Seasonal fruits</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">120 cal</div>
+                                <button onclick="selectMeal('snack', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dinner -->
+                <div class="meal-card rounded-2xl shadow-lg p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="heading-font text-xl font-semibold text-forest">🌙 Dinner</h4>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full button-font">7:00 PM</span>
+                    </div>
+                    <div class="space-y-3" id="dinner-options">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Fish/Chicken</div>
+                                <div class="text-sm text-gray-600">+ Baked Sweet Potato + Mixed Green Salad</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">420 cal</div>
+                                <button onclick="selectMeal('dinner', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Stir-fried Shrimp/Chicken</div>
+                                <div class="text-sm text-gray-600">+ Broccoli + Snap Peas + Bell Peppers + Rice</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">450 cal</div>
+                                <button onclick="selectMeal('dinner', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-gray-800">Dal (1 Bowl)</div>
+                                <div class="text-sm text-gray-600">+ 2 Chapati + 1 Sabji + Salad</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-semibold text-orange">400 cal</div>
+                                <button onclick="selectMeal('dinner', this)" class="text-xs bg-green-500 text-white px-2 py-1 rounded mt-1 hover:bg-green-600 transition-colors">
+                                    Select
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selected Meals Summary -->
+            <div class="mt-12 bg-white rounded-2xl shadow-lg p-8">
+                <h4 class="heading-font text-2xl font-semibold text-forest mb-6">Today's Selected Meals</h4>
+                <div id="selected-meals" class="space-y-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <p>Select your meals above to see your daily plan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weight Logging Modal -->
+    <div id="weight-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <h3 class="heading-font text-2xl font-bold text-forest mb-6">Log Your Weight</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Weight (kg)</label>
+                    <input type="number" id="weight-input" step="0.1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="93.0">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date" id="weight-date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                </div>
+                <div class="flex space-x-4 pt-4">
+                    <button onclick="saveWeight()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg button-font font-semibold transition-colors">
+                        Save Weight
+                    </button>
+                    <button onclick="closeWeightModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg button-font font-semibold transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600 button-font">© 2025 Vikas & Supriya's Diet Tracker - Your Health Journey Companion</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

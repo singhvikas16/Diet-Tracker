@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Tracking - Diet Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .heading-font { font-family: 'Playfair Display', serif; }
+        .button-font { font-family: 'Poppins', sans-serif; }
+        .bg-sage { background-color: #F0F4F0; }
+        .text-forest { color: #2D5A27; }
+        .text-sage { color: #8FBC8F; }
+        .bg-forest { background-color: #2D5A27; }
+        .bg-orange { background-color: #FF6B35; }
+        .text-orange { color: #FF6B35; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(45, 90, 39, 0.15); }
+        .chart-container { height: 400px; }
+        .progress-circle { transform: rotate(-90deg); }
+    </style>
+</head>
+<body class="bg-sage min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="heading-font text-2xl font-bold text-forest">🌱 Diet Tracker</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Dashboard</a>
+                        <a href="progress.html" class="text-forest hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Progress</a>
+                        <a href="meals.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Meal Library</a>
+                        <a href="cheat-day.html" class="text-gray-600 hover:text-orange px-3 py-2 rounded-md text-sm font-medium button-font">Cheat Day</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="bg-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="heading-font text-4xl font-bold text-forest mb-4">Your Progress Journey</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Track your weight loss progress, celebrate milestones, and stay motivated on your path to 80kg
+            </p>
+        </div>
+    </section>
+
+    <!-- Progress Overview -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Weight Progress Circle -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 text-center card-hover">
+                    <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Weight Progress</h3>
+                    <div class="relative w-48 h-48 mx-auto mb-6">
+                        <svg class="w-full h-full progress-circle">
+                            <circle cx="96" cy="96" r="80" stroke="#e5e7eb" stroke-width="12" fill="none"/>
+                            <circle cx="96" cy="96" r="80" stroke="#2D5A27" stroke-width="12" fill="none" 
+                                    stroke-dasharray="502.65" stroke-dashoffset="502.65" id="progress-circle"/>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-forest" id="progress-percentage">0%</div>
+                                <div class="text-sm text-gray-600">Complete</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Start:</span>
+                            <span class="font-semibold">93.0 kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Current:</span>
+                            <span class="font-semibold text-orange" id="current-weight-display">93.0 kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Target:</span>
+                            <span class="font-semibold">80.0 kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Progress -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Weekly Summary</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🎯</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Weekly Goal</div>
+                                    <div class="text-sm text-gray-600">0.5 kg loss</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-green-600" id="weekly-loss">0.0 kg</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">📊</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Avg. Daily Calories</div>
+                                    <div class="text-sm text-gray-600">This week</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-blue-600" id="avg-calories">1650</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🔥</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Streak</div>
+                                    <div class="text-sm text-gray-600">Tracking days</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-orange-600" id="tracking-streak">7 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Achievements</h3>
+                    <div class="space-y-4" id="achievements-list">
+                        <div class="flex items-center space-x-3 p-3 bg-yellow-50 rounded-lg">
+                            <span class="text-2xl">🏆</span>
+                            <div>
+                                <div class="font-semibold text-gray-800">First Week Complete!</div>
+                                <div class="text-sm text-gray-600">Started your journey</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg opacity-50">
+                            <span class="text-2xl">🎖️</span>
+                            <div>
+                                <div class="font-semibold text-gray-600">5kg Milestone</div>
+                                <div class="text-sm text-gray-500">Unlock at 88kg</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg opacity-50">
+                            <span class="text-2xl">⭐</span>
+                            <div>
+                                <div class="font-semibold text-gray-600">Consistency Master</div>
+                                <div class="text-sm text-gray-500">30-day streak</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <!-- Weight Loss Chart -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Weight Loss Trend</h3>
+                    <div id="weight-chart" class="chart-container"></div>
+                </div>
+
+                <!-- Calorie Tracking Chart -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Daily Calorie Intake</h3>
+                    <div id="calorie-chart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Monthly Calendar View -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 card-hover mb-12">
+                <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Monthly Progress Calendar</h3>
+                <div class="grid grid-cols-7 gap-2 mb-4">
+                    <div class="text-center font-semibold text-gray-600 py-2">Sun</div>
+                    <div class="text-center font-semibold text-gray-600 py-2">Mon</div>
+                    <div class="text-center font-semibold text-gray-600 py-2">Tue</div>
+                    <div class="text-center font-semibold text-gray-600 py-2">Wed</div>
+                    <div class="text-center font-semibold text-gray-600 py-2">Thu</div>
+                    <div class="text-center font-semibold text-gray-600 py-2">Fri</div>
+                    <div class="text-center font-semibold text-gray-600 py-2">Sat</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+                <div class="flex items-center justify-center space-x-6 mt-6 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-gray-200 rounded"></div>
+                        <span>No data</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-green-200 rounded"></div>
+                        <span>On track</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-green-400 rounded"></div>
+                        <span>Great progress</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 bg-green-600 rounded"></div>
+                        <span>Excellent</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Photos Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <h3 class="heading-font text-2xl font-semibold text-forest mb-6">Progress Photos</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center mb-4">
+                            <div class="text-center text-gray-500">
+                                <div class="text-4xl mb-2">📷</div>
+                                <div>Starting Photo</div>
+                                <div class="text-sm">93.0 kg</div>
+                            </div>
+                        </div>
+                        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg button-font transition-colors">
+                            Add Photo
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center mb-4">
+                            <div class="text-center text-gray-500">
+                                <div class="text-4xl mb-2">📸</div>
+                                <div>Current Photo</div>
+                                <div class="text-sm">Current weight</div>
+                            </div>
+                        </div>
+                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg button-font transition-colors">
+                            Take Photo
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center mb-4">
+                            <div class="text-center text-gray-500">
+                                <div class="text-4xl mb-2">🎯</div>
+                                <div>Target Photo</div>
+                                <div class="text-sm">80.0 kg</div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600">Goal to achieve!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-600 button-font">© 2025 Vikas & Supriya's Diet Tracker - Your Health Journey Companion</p>
+        </div>
+    </footer>
+
+    <script>
+        class ProgressTracker {
+            constructor() {
+                this.currentWeight = 93.0;
+                this.targetWeight = 80.0;
+                this.startWeight = 93.0;
+                this.weightHistory = this.generateMockWeightData();
+                this.calorieHistory = this.generateMockCalorieData();
+                this.init();
+            }
+
+            init() {
+                this.loadData();
+                this.updateProgressCircle();
+                this.createWeightChart();
+                this.createCalorieChart();
+                this.generateCalendar();
+                this.updateWeeklyStats();
+                this.animateElements();
+            }
+
+            loadData() {
+                const savedData = localStorage.getItem('dietTrackerData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    this.currentWeight = data.currentWeight || 93.0;
+                    this.weightHistory = data.weightHistory || this.generateMockWeightData();
+                }
+            }
+
+            generateMockWeightData() {
+                const data = [];
+                const today = new Date();
+                
+                // Generate 30 days of mock weight data
+                for (let i = 30; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    
+                    // Simulate gradual weight loss with some fluctuations
+                    const baseWeight = 93.0 - (i * 0.02);
+                    const fluctuation = (Math.random() - 0.5) * 0.5;
+                    const weight = Math.max(baseWeight + fluctuation, this.targetWeight);
+                    
+                    data.push({
+                        date: date.toISOString().split('T')[0],
+                        weight: Math.round(weight * 10) / 10
+                    });
+                }
+                
+                return data;
+            }
+
+            generateMockCalorieData() {
+                const data = [];
+                const today = new Date();
+                
+                for (let i = 30; i >= 0; i--) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    
+                    // Simulate calorie intake around 1600-1800
+                    const baseCalories = 1700;
+                    const variation = (Math.random() - 0.5) * 400;
+                    const calories = Math.max(1200, baseCalories + variation);
+                    
+                    data.push({
+                        date: date.toISOString().split('T')[0],
+                        calories: Math.round(calories)
+                    });
+                }
+                
+                return data;
+            }
+
+            updateProgressCircle() {
+                const totalLoss = this.startWeight - this.targetWeight;
+                const currentLoss = this.startWeight - this.currentWeight;
+                const progress = Math.max(0, Math.min(100, (currentLoss / totalLoss) * 100));
+                
+                const circle = document.getElementById('progress-circle');
+                const percentage = document.getElementById('progress-percentage');
+                const currentWeightDisplay = document.getElementById('current-weight-display');
+                
+                if (circle && percentage && currentWeightDisplay) {
+                    const circumference = 2 * Math.PI * 80;
+                    const offset = circumference - (progress / 100) * circumference;
+                    
+                    anime({
+                        targets: circle,
+                        strokeDashoffset: offset,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    });
+                    
+                    anime({
+                        targets: percentage,
+                        innerHTML: [0, Math.round(progress)],
+                        duration: 2000,
+                        round: 1,
+                        easing: 'easeOutQuart',
+                        update: function(anim) {
+                            percentage.innerHTML = Math.round(anim.animatables[0].target.innerHTML) + '%';
+                        }
+                    });
+                    
+                    currentWeightDisplay.textContent = this.currentWeight.toFixed(1) + ' kg';
+                }
+            }
+
+            createWeightChart() {
+                const chartDom = document.getElementById('weight-chart');
+                if (!chartDom) return;
+                
+                const myChart = echarts.init(chartDom);
+                
+                const option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function(params) {
+                            return `Date: ${params[0].axisValue}<br/>Weight: ${params[0].value} kg`;
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: this.weightHistory.map(d => d.date),
+                        axisLabel: {
+                            formatter: function(value) {
+                                return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        min: this.targetWeight - 2,
+                        max: this.startWeight + 2,
+                        axisLabel: {
+                            formatter: '{value} kg'
+                        }
+                    },
+                    series: [{
+                        name: 'Weight',
+                        type: 'line',
+                        data: this.weightHistory.map(d => d.weight),
+                        smooth: true,
+                        lineStyle: {
+                            color: '#2D5A27',
+                            width: 3
+                        },
+                        itemStyle: {
+                            color: '#2D5A27'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: 'rgba(45, 90, 39, 0.3)'
+                                }, {
+                                    offset: 1, color: 'rgba(45, 90, 39, 0.1)'
+                                }]
+                            }
+                        },
+                        markLine: {
+                            data: [{
+                                yAxis: this.targetWeight,
+                                name: 'Target Weight',
+                                lineStyle: {
+                                    color: '#FF6B35',
+                                    type: 'dashed'
+                                },
+                                label: {
+                                    formatter: 'Target: {c} kg'
+                                }
+                            }]
+                        }
+                    }]
+                };
+                
+                myChart.setOption(option);
+                
+                // Make chart responsive
+                window.addEventListener('resize', () => {
+                    myChart.resize();
+                });
+            }
+
+            createCalorieChart() {
+                const chartDom = document.getElementById('calorie-chart');
+                if (!chartDom) return;
+                
+                const myChart = echarts.init(chartDom);
+                
+                const option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: function(params) {
+                            return `Date: ${params[0].axisValue}<br/>Calories: ${params[0].value}`;
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: this.calorieHistory.map(d => d.date),
+                        axisLabel: {
+                            formatter: function(value) {
+                                return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} cal'
+                        }
+                    },
+                    series: [{
+                        name: 'Calories',
+                        type: 'bar',
+                        data: this.calorieHistory.map(d => d.calories),
+                        itemStyle: {
+                            color: function(params) {
+                                const value = params.value;
+                                if (value <= 1500) return '#27AE60';
+                                if (value <= 1800) return '#F39C12';
+                                return '#E74C3C';
+                            }
+                        },
+                        markLine: {
+                            data: [{
+                                yAxis: 1800,
+                                name: 'Daily Target',
+                                lineStyle: {
+                                    color: '#FF6B35',
+                                    type: 'dashed'
+                                },
+                                label: {
+                                    formatter: 'Target: {c} cal'
+                                }
+                            }]
+                        }
+                    }]
+                };
+                
+                myChart.setOption(option);
+                
+                window.addEventListener('resize', () => {
+                    myChart.resize();
+                });
+            }
+
+            generateCalendar() {
+                const calendarGrid = document.getElementById('calendar-grid');
+                if (!calendarGrid) return;
+                
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - firstDay.getDay());
+                
+                let html = '';
+                const currentDate = new Date(startDate);
+                
+                for (let i = 0; i < 42; i++) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    const isCurrentMonth = currentDate.getMonth() === today.getMonth();
+                    const isToday = dateStr === today.toISOString().split('T')[0];
+                    
+                    let intensity = 'bg-gray-200';
+                    if (isCurrentMonth && Math.random() > 0.3) {
+                        const randomIntensity = Math.random();
+                        if (randomIntensity > 0.8) intensity = 'bg-green-600';
+                        else if (randomIntensity > 0.6) intensity = 'bg-green-400';
+                        else if (randomIntensity > 0.4) intensity = 'bg-green-200';
+                    }
+                    
+                    html += `
+                        <div class="aspect-square ${intensity} rounded-lg flex items-center justify-center text-sm font-medium ${isToday ? 'ring-2 ring-orange-500' : ''} ${isCurrentMonth ? 'text-gray-800' : 'text-gray-400'}">
+                            ${currentDate.getDate()}
+                        </div>
+                    `;
+                    
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                
+                calendarGrid.innerHTML = html;
+            }
+
+            updateWeeklyStats() {
+                const weeklyLoss = (this.startWeight - this.currentWeight) / 4; // Approximate weekly loss
+                const avgCalories = this.calorieHistory.slice(-7).reduce((sum, d) => sum + d.calories, 0) / 7;
+                
+                document.getElementById('weekly-loss').textContent = weeklyLoss.toFixed(1) + ' kg';
+                document.getElementById('avg-calories').textContent = Math.round(avgCalories);
+            }
+
+            animateElements() {
+                const cards = document.querySelectorAll('.card-hover');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            anime({
+                                targets: entry.target,
+                                translateY: [50, 0],
+                                opacity: [0, 1],
+                                duration: 800,
+                                easing: 'easeOutQuart',
+                                delay: Math.random() * 200
+                            });
+                        }
+                    });
+                });
+
+                cards.forEach(card => observer.observe(card));
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProgressTracker();
+        });
+    </script>
+</body>
+</html>
